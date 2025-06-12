@@ -98,6 +98,31 @@ tasks:
       - KUBECONFIG="/root/kubeconfig.microshift" oc -n openshift-dpu-operator wait --for=condition=ready pod --all --timeout=300s
       - KUBECONFIG="/root/kubeconfig.ocpcluster" oc -n openshift-dpu-operator wait --for=condition=ready pod --all --timeout=300s
 
+  deploy-on-dpu:
+    cmds:
+      - task: undeploy-on-dpu
+      - bin/kustomize build bin | KUBECONFIG="/root/kubeconfig.microshift" oc apply -f -
+      - KUBECONFIG="/root/kubeconfig.microshift" oc -n openshift-dpu-operator wait --for=condition=ready pod --all --timeout=300s
+
+  deploy-on-host:
+    cmds:
+      - task: undeploy-on-host
+      - bin/kustomize build bin | KUBECONFIG="/root/kubeconfig.ocpcluster" oc apply -f -
+      - KUBECONFIG="/root/kubeconfig.ocpcluster" oc -n openshift-dpu-operator wait --for=condition=ready pod --all --timeout=300s
+
+  undeploy-on-dpu:
+    cmds:
+      - task: undeploy-helper
+        vars:
+          KUBECONFIG: "/root/kubeconfig.microshift"
+
+  undeploy-on-host:
+    cmds:
+      - task: undeploy-helper
+        vars:
+          KUBECONFIG: "/root/kubeconfig.ocpcluster"
+
+
   prepare-e2e-test:
     cmds:
       - >
